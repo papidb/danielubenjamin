@@ -1,10 +1,10 @@
 {
-	"title": "ThoughtLite",
-	"prologue": "If you need a website\nthat loads fast and has great SEO, then Astro is for you.",
+	"title": "Daniel Benjamin",
+	"prologue": "I'm Daniel Benjamin, a full-stack software engineer from Lagos, Nigeria — I work across mobile, backend, and cloud infrastructure, using React Native, Golang, Node.js, to build things that are both fast and maintainable.",
 	"author": {
-		"name": "Your Name",
-		"email": "hi@your.mail",
-		"link": "https://your.website"
+		"name": "Daniel Benjamin",
+		"email": "benjamindaniel706@gmail.com",
+		"link": "https://danielubenjamin.com"
 	},
 	"description": "A modern Astro theme focused on content creation.",
 	"copyright": {

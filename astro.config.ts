@@ -43,7 +43,7 @@ export default defineConfig({
     },
     imageService: "compile"
   }),
-  site: "https://thought-lite.ttio.workers.dev",
+  site: "https://danielubenjamin.com",
   trailingSlash: "never",
   i18n: {
     locales: ["en", "zh-cn", "ja"],
