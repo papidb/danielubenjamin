@@ -15,7 +15,13 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
-.todo*
+
+# lock files
+package-lock.json
+yarn.lock
+
+# TODO files
+todo*
 
 # environment variables
 .env

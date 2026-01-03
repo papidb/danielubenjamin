@@ -1,5 +1,6 @@
 // Import ShikiTransformer type for syntax highlighting transformations
-import type { ShikiTransformer } from 'shiki';
+import type { ShikiTransformer } from "shiki";
+import { h } from "hastscript";
 
 /**
  * Creates a Shiki transformer that adds copy-to-clipboard functionality to code blocks
@@ -9,15 +10,18 @@ import type { ShikiTransformer } from 'shiki';
  */
 const copy: (options: { duration: number }) => ShikiTransformer = ({ duration }) => ({
 	name: "code-copy-button",
-	// Transform the code block by adding a copy button
-	code(node): void {
-		// Add copy button element to the code block
-		node.children.push({
+	// Transform the pre element by adding a copy button and wrapping it in a container
+	root(node): void {
+		// Wrap the existing code block
+		const wrapper = h("div.code-container", [node.children[0]]);
+
+		// Append the copy button element
+		wrapper.children.push({
 			type: "element",
 			tagName: "button",
 			properties: {
 				type: "button",
-				data: this.source,		// Store the source code in data attribute
+				data: this.source, // Store the source code in data attribute
 				class: "code-copy-button",
 				"aria-hidden": true,
 				// Inline click handler: copies code to clipboard and shows visual feedback
@@ -50,7 +54,7 @@ const copy: (options: { duration: number }) => ShikiTransformer = ({ duration })
 								d: "M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"
 							},
 							children: []
-						},
+						}
 					]
 				},
 				// Checkmark icon - shown when code is successfully copied
@@ -75,8 +79,11 @@ const copy: (options: { duration: number }) => ShikiTransformer = ({ duration })
 					]
 				}
 			]
-		})
-	},
+		});
+
+		// Replace the original node's children with the new wrapper
+		node.children = [wrapper];
+	}
 });
 
 export default copy;

@@ -18,11 +18,16 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
 
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        version: 10
+
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: '22'
-        cache: 'npm'
+        cache: 'pnpm'
 
     - name: Export Environment Variables
       run: echo '${{ secrets.ENV }}' > .env
@@ -35,10 +40,16 @@ jobs:
         sed -i 's/<DATABASE_ID>/${{ secrets.CLOUDFLARE_DATABASE_ID }}/g' wrangler.toml
 
     - name: Install dependencies
-      run: npm ci
+      run: pnpm install --frozen-lockfile
+
+    - name: Font Cache
+      uses: actions/cache@v3
+      with:
+        path: node_modules/.cache/og-fonts
+        key: og-fonts-cache-v1
 
     - name: Build project
-      run: npm run build
+      run: pnpm run build
 
     - name: Run database migrations
       uses: cloudflare/wrangler-action@v3
@@ -47,7 +58,7 @@ jobs:
         accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         command: d1 migrations apply DB --remote
 
-    - name: Deploy to CloudFlare Workers
+    - name: Deploy to Cloudflare Workers
       uses: cloudflare/wrangler-action@v3
       with:
         apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}

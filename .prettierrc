@@ -5,23 +5,11 @@
 	"semi": true,
 	"singleQuote": false,
 	"quoteProps": "as-needed",
+	"endOfLine": "auto",
 	"trailingComma": "none",
 	"bracketSpacing": true,
 	"bracketSameLine": true,
 	"arrowParens": "avoid",
-	"plugins": [
-		"prettier-plugin-astro"
-	],
-	"pluginSearchDirs": [
-		"."
-	],
-	"overrides": [
-		{
-			"files": "*.svelte",
-			"options": {
-				"parser": "svelte"
-			}
-		}
-	],
-	"svelteSortOrder": "styles-markup-options-scripts"
+	"plugins": ["prettier-plugin-astro", "prettier-plugin-svelte"],
+	"svelteSortOrder": "options-scripts-markup-styles"
 }

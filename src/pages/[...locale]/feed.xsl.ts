@@ -1,21 +1,22 @@
 import type { APIRoute } from "astro";
-import { i18n } from "astro:config/client";
 import { getRelativeLocaleUrl } from "astro:i18n";
+import config from "$config";
 import i18nit from "$i18n";
 
 export async function getStaticPaths() {
-  return i18n!.locales.map(locale => ({ params: { locale: locale == i18n?.defaultLocale ? undefined : (locale as string) } }));
+	// Create path for each locale, omitting default locale from URL
+	return config.i18n.locales.map(locale => ({ params: { locale: config.i18n.defaultLocale === locale ? undefined : locale } }));
 }
 
 export const GET: APIRoute = ({ params }) => {
-  const { locale = i18n?.defaultLocale! } = params;
-  const t = i18nit(locale);
+	const { locale = config.i18n.defaultLocale } = params;
+	const t = i18nit(locale);
 
-  const text = `<?xml version="1.0" encoding="UTF-8"?>
+	const text = `<?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:atom="http://www.w3.org/2005/Atom">
   <xsl:output method="html" encoding="UTF-8" omit-xml-declaration="yes" />
   <xsl:template match="/">
-    <html>
+    <html dir="${["ar", "he", "fa", "ur"].includes(locale) ? "rtl" : "ltr"}">
 
     <head>
       <meta charset="utf-8" />
@@ -94,5 +95,5 @@ export const GET: APIRoute = ({ params }) => {
   </xsl:template>
 </xsl:stylesheet>`;
 
-  return new Response(text, { headers: { "Content-Type": "text/xsl" } });
+	return new Response(text, { headers: { "Content-Type": "text/xsl" } });
 };
