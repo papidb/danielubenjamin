@@ -3,14 +3,14 @@ import siteConfig, { providers } from "./src/utils/config";
 const env = import.meta.env ?? {};
 
 const config = siteConfig({
-	title: "ThoughtLite",
-	prologue: "If you need a website\nthat loads fast and has great SEO, then Astro is for you.",
+	title: "Daniel Benjamin",
+	prologue: "",
 	author: {
-		name: "Your Name",
-		email: "hi@your.mail",
-		link: "https://your.website"
+		name: "Daniel U. Benjamin",
+		email: "benjamindaniel706@gmail.com",
+		link: "https://danielubenjamin.com"
 	},
-	description: "A modern Astro theme focused on content creation.",
+	description: "Daniel U. Benjamin's Personal Website",
 	copyright: {
 		type: "CC BY-NC-ND 4.0",
 		year: "2025"
