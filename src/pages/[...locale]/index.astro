@@ -5,7 +5,7 @@ import config, { monolocale } from "$config";
 import Time from "$utils/time";
 import Base from "$layouts/Base.astro";
 import Heatmap from "$components/Heatmap.svelte";
-import Logo from "$icons/site-logo.svg";
+
 import i18nit from "$i18n";
 
 export async function getStaticPaths() {
@@ -80,7 +80,9 @@ const { Content } = preface ? await render(preface) : ({} as any);
 	<main class="flex flex-col gap-5 sm:gap-20 grow">
 		<header class="flex items-center justify-center flex-wrap-reverse grow-[0.6]">
 			{config.prologue && <article class="me-auto font-cursive font-thin text-xl sm:text-2xl leading-loose whitespace-pre-line">{config.prologue}</article>}
-			<Logo width={100} />
+			<div class="w-36 h-36 sm:w-44 sm:h-44 rounded-full overflow-hidden shrink-0">
+				<img src="/daniel.JPG" alt="Daniel Benjamin" class="w-full h-full object-cover object-top" />
+			</div>
 		</header>
 
 		{
