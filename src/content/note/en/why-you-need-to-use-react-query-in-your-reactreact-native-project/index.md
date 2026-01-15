@@ -1,7 +1,7 @@
 ---
 title: Why you need to use React-Query in your React/React Native project
 timestamp: 2021-06-28 20:21:16+01:00
-tags: [React,React Native,ReactQuery,Datafetching]
+tags: [React,React Native,ReactQuery,State Management]
 toc: true
 ---
 
