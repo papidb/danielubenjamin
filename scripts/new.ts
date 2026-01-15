@@ -154,7 +154,7 @@ const CANCEL_MESSAGE = t("new.cancel");
 				{ label: t("new.step.options.top"), value: "top" },
 				{ label: t("new.step.options.sensitive"), value: "sensitive" }
 			],
-			initialValues: ["draft"],
+			initialValues: ["draft", "toc"],
 			required: false
 		});
 
@@ -174,7 +174,7 @@ const CANCEL_MESSAGE = t("new.cancel");
 				{ label: t("new.step.structure.flat"), value: "flat", hint: `${id}.md` },
 				{ label: t("new.step.structure.folder"), value: "folder", hint: `${id}/index.md` }
 			],
-			initialValue: "flat"
+			initialValue: "folder"
 		});
 
 		// Exit if user cancels the selection
