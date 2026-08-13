@@ -1,0 +1,61 @@
+---
+title: Pages in Postgres
+timestamp: 2026-01-17 21:51:39+01:00
+tags: [Database, Postgres]
+toc: true
+draft: false
+---
+
+import PostgresPage from "$components/interactive/PostgresPage.svelte";
+
+## Introduction
+
+PostgreSQL stores all data in fixed-size **pages** (also called blocks). By default, each page is **8KB** (8192 bytes). Understanding how pages work is fundamental to understanding Postgres performance and storage.
+
+## Page Anatomy
+
+Every Postgres page has the same basic structure:
+
+1. **Page Header** (24 bytes) - Contains metadata like checksum, flags, and pointers to free space
+2. **Line Pointers** (4 bytes each) - An array of offsets pointing to actual tuples
+3. **Free Space** - Empty space available for new data
+4. **Tuples** - The actual row data, growing from the bottom of the page upward
+
+### Interactive Visualization
+
+Try the interactive demo below to understand how data fills a Postgres page:
+
+<PostgresPage client:visible />
+
+### Key Observations
+
+As you interact with the visualization above, notice:
+
+- **Tuples grow upward** from the bottom of the page
+- **Line pointers grow downward** from the top (after the header)
+- **Free space shrinks** as more data is added
+- **Dead tuples** still occupy space until `VACUUM` runs
+- **Bloat** occurs when dead tuples accumulate
+
+## Why This Matters
+
+Understanding page structure helps explain several Postgres behaviors:
+
+### 1. The Need for VACUUM
+
+When you `DELETE` or `UPDATE` a row, Postgres doesn't immediately reclaim the space. Instead, it marks the tuple as "dead". The `VACUUM` process later reclaims this space.
+
+### 2. Table Bloat
+
+If dead tuples accumulate faster than `VACUUM` can clean them up, your table grows larger than necessary. This is called **table bloat**.
+
+### 3. FILLFACTOR
+
+You can configure how full Postgres should fill each page using `FILLFACTOR`. Leaving some free space (e.g., `FILLFACTOR=90`) allows `UPDATE` operations to store new tuple versions on the same page.
+
+## Summary
+
+- Postgres stores data in 8KB pages
+- Each page has a header, line pointers, free space, and tuples
+- Deleted data becomes "dead tuples" that need vacuuming
+- Understanding pages helps you optimize storage and performance
