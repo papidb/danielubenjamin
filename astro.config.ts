@@ -42,7 +42,7 @@ export default defineConfig({
 		prerenderEnvironment: "node",
 		imageService: "compile"
 	}),
-	site: "https://danielubenjamin.com",
+	site: "https://thought-lite.ttio.workers.dev",
 	trailingSlash: "never",
 	i18n: {
 		...siteConfig.i18n,

@@ -20,25 +20,21 @@ const CANCEL_MESSAGE = t("new.cancel");
 	// Determine the base content directory path
 	let path = join(dirname(fileURLToPath(import.meta.url)), "..", "src", "content");
 
-	// Select content type: Note, Jotting, Preface, or Interactive
+	// Select content type: Note, Jotting, or Preface
 	const contentType = await select({
 		message: t("new.step.type"),
 		options: [
 			{ label: t("new.note.name"), value: "note", hint: t("new.note.description") },
 			{ label: t("new.jotting.name"), value: "jotting", hint: t("new.jotting.description") },
-			{ label: t("new.preface.name"), value: "preface", hint: t("new.preface.description") },
-			{ label: t("new.interactive.name"), value: "interactive", hint: t("new.interactive.description") }
+			{ label: t("new.preface.name"), value: "preface", hint: t("new.preface.description") }
 		]
 	});
 
 	// Exit if user cancels the selection
 	isCancel(contentType) && (cancel(CANCEL_MESSAGE), process.exit(0));
 
-	// Interactive posts are stored in the note collection but use MDX format
-	const isInteractive = contentType === "interactive";
-	const actualContentType = isInteractive ? "note" : contentType;
-
-	path = join(path, actualContentType);
+	// Update path based on selected content type
+	path = join(path, contentType);
 
 	// Select language for the article (skip if single language mode)
 	let locale: string | symbol = config.i18n.defaultLocale;
@@ -60,9 +56,7 @@ const CANCEL_MESSAGE = t("new.cancel");
 	let content = "";
 	const timestamp = Temporal.Now.zonedDateTimeISO().toString({ smallestUnit: "second", timeZoneName: "never" }).replace("T", " ");
 
-	// Track the article ID for interactive posts (needed to create component folder)
-	let articleId: string | undefined;
-
+	// Generate frontmatter metadata based on content type
 	const information: any = {};
 	if (contentType === "preface") {
 		// Preface uses timestamp as filename
@@ -72,6 +66,9 @@ const CANCEL_MESSAGE = t("new.cancel");
 		// Generate filename from timestamp (e.g., 1970-01-01-00-00-00.md)
 		path = join(path, `${timestamp.substring(0, 19).replace(/[\s:]/g, "-")}.md`);
 	} else {
+		// Note and Jotting require additional metadata
+		content += i18nit(locale, "script")("new.article.start");
+
 		// Prompt user to input article title
 		const title = await text({
 			message: t("new.step.title.name"),
@@ -109,8 +106,8 @@ const CANCEL_MESSAGE = t("new.cancel");
 		// Exit if user cancels the input
 		isCancel(id) && (cancel(CANCEL_MESSAGE), process.exit(0));
 
-		// If content type is Note or Interactive, allow user to specify a series
-		if (contentType === "note" || isInteractive) {
+		// If content type is Note, allow user to specify a series
+		if (contentType === "note") {
 			// Prompt user to input series name (optional)
 			const series = await text({
 				message: t("new.step.series.name"),
@@ -148,15 +145,16 @@ const CANCEL_MESSAGE = t("new.cancel");
 		// Add description to frontmatter if provided
 		if (description) information.description = description;
 
+		// Prompt user to select additional options (draft, toc, top, sensitive)
 		const options = await multiselect({
 			message: t("new.step.options.name"),
 			options: [
 				{ label: t("new.step.options.draft"), value: "draft" },
-				...(contentType === "note" || isInteractive ? [{ label: t("new.step.options.toc"), value: "toc" }] : []),
+				...(contentType === "note" ? [{ label: t("new.step.options.toc"), value: "toc" }] : []),
 				{ label: t("new.step.options.top"), value: "top" },
 				{ label: t("new.step.options.sensitive"), value: "sensitive" }
 			],
-			initialValues: ["draft", "toc"],
+			initialValues: ["draft"],
 			required: false
 		});
 
@@ -169,34 +167,27 @@ const CANCEL_MESSAGE = t("new.cancel");
 		if (options.includes("top")) information.top = 1;
 		if (options.includes("draft")) information.draft = true;
 
-		// Interactive posts always use folder structure with MDX
-		if (isInteractive) {
-			articleId = id;
-			content += i18nit(locale, "script")("new.interactive.start").replace("{id}", id);
-			path = join(path, id, "index.mdx");
+		// Prompt user to choose file structure: flat (single .md file) or folder (with index.md)
+		const folder = await select({
+			message: t("new.step.structure.name"),
+			options: [
+				{ label: t("new.step.structure.flat"), value: "flat", hint: `${id}.md` },
+				{ label: t("new.step.structure.folder"), value: "folder", hint: `${id}/index.md` }
+			],
+			initialValue: "flat"
+		});
+
+		// Exit if user cancels the selection
+		isCancel(folder) && (cancel(CANCEL_MESSAGE), process.exit(0));
+
+		// Set file path based on selected structure
+		if (folder === "folder") {
+			// Folder structure: content-type/locale/ID/index.md
+			path = join(path, id, "index.md");
 		} else {
-			content += i18nit(locale, "script")("new.article.start");
-			const folder = await select({
-				message: t("new.step.structure.name"),
-				options: [
-					{ label: t("new.step.structure.flat"), value: "flat", hint: `${id}.md` },
-					{ label: t("new.step.structure.folder"), value: "folder", hint: `${id}/index.md` }
-				],
-				initialValue: "folder"
-			});
-
-			isCancel(folder) && (cancel(CANCEL_MESSAGE), process.exit(0));
-
-			if (folder === "folder") {
-				path = join(path, id, "index.md");
-			} else {
-				path = join(path, `${id}.md`);
-			}
+			// Flat structure: content-type/locale/ID.md
+			path = join(path, `${id}.md`);
 		}
-	}
-
-	if (!content) {
-		content = i18nit(locale, "script")("new.article.start");
 	}
 
 	// Construct frontmatter with metadata and content template
@@ -239,13 +230,6 @@ ${content}
 	waiting.start(t("new.creating"));
 
 	writeFileSync(path, content, "utf-8");
-
-	if (isInteractive && articleId) {
-		const componentsDir = join(dirname(fileURLToPath(import.meta.url)), "..", "src", "components", "interactive", articleId);
-		mkdirSync(componentsDir, { recursive: true });
-		writeFileSync(join(componentsDir, ".gitkeep"), "", "utf-8");
-	}
-
 	waiting.stop(`✅ ${t("new.created")}`);
 
 	// Ask if user wants to open the file in VS Code
