@@ -22,7 +22,7 @@
 > - `main` 分支：静态化构建，可部署在任何静态托管平台。
 > - `cloudflare` 分支✅：启用内置评论系统，仅支持在 Cloudflare 部署。
 
-🎬 **在线演示**：[Cloudflare Workers](https://thought-lite.ttio.workers.dev/zh-cn/)
+🎬 **在线演示**：[Cloudflare Workers](https://thought-lite.ttio.workers.dev/zh-cn)
 
 ## ✨ 特性
 
@@ -75,14 +75,14 @@ pnpm dev
 
 ## 🔧 配置
 
-1. 创建 Cloudflare D1，参阅[Cloudflare D1 配置指南](src/content/note/zh-cn/cloudflare-d1.md)。
-2. 配置 Cloudflare Turnstile，参阅[Cloudflare Turnstile 配置指南](src/content/note/zh-cn/cloudflare-turnstile.md)。
-    - 如果不启用匿名评论，可跳过这一步。
-3. 配置 OAuth 认证，参阅[OAuth 配置指南](src/content/note/zh-cn/oauth.md)。
-4. 自定义站点配置及国际化（i18n）配置，请修改以下文件，参阅[站点配置指南](src/content/note/zh-cn/configuration.md)及[国际化配置指南](src/content/note/zh-cn/internationalization.md)：
-    - `.env`
-    - `astro.config.ts`
-    - `site.config.ts`
+主题相关配置请参阅以下文档：
+
+- [Astro 配置参考](https://docs.astro.build/zh-cn/reference/configuration-reference/)
+- [站点配置指南](https://thought-lite.ttio.workers.dev/zh-cn/note/configuration)
+- [国际化配置指南](https://thought-lite.ttio.workers.dev/zh-cn/note/internationalization)
+- [评论系统配置指南](https://thought-lite.ttio.workers.dev/zh-cn/note/comment)
+- [通知配置指南](https://thought-lite.ttio.workers.dev/zh-cn/note/notification)
+- [OAuth 配置指南](https://thought-lite.ttio.workers.dev/zh-cn/note/oauth)
 
 ## 💻 命令
 
@@ -135,7 +135,7 @@ pnpm db:migrate:local
 - `preface` - 序文，作为第一印象在站点首页展示
 - `information` - 信息，包含各类说明性内容
 
-详情请参阅[内容创作指南](src/content/note/zh-cn/content.md)。
+详情请参阅[内容创作指南](https://thought-lite.vercel.app/zh-cn/note/content)。
 
 ## 🤝 贡献
 
@@ -144,7 +144,8 @@ pnpm db:migrate:local
 - 宣传项目或帮助其他用户
 - 提交 [issues](https://github.com/tuyuritio/astro-theme-thought-lite/issues) 或新功能建议
 - 改进文档及国际化（i18n）支持
-- 贡献代码 - 详情请参阅[代码贡献指南](CONTRIBUTING.md)
+- 贡献代码
+- 更多信息请参阅[代码贡献指南](CONTRIBUTING.md)
 
 ## 🙏 鸣谢
 
@@ -158,7 +159,6 @@ pnpm db:migrate:local
 - **字体** - [Google Fonts](https://fonts.google.com/) | [ZeoSeven Fonts](https://fonts.zeoseven.com/)
 - **图片查看器** - [Medium Zoom](https://github.com/francoischalifour/medium-zoom)
 - **SPA 过渡** - [Swup](https://swup.js.org/)
-- **时间处理** - [Luxon](https://moment.github.io/luxon/)
 - **OAuth 认证** - [Arctic](https://arcticjs.dev/)
 - **代码质量** - [Biome](https://biomejs.dev/)
 - **对象关系映射** - [Drizzle ORM](https://orm.drizzle.team/)
@@ -169,7 +169,7 @@ pnpm db:migrate:local
 
 - [Astro Sphere](https://github.com/markhorn-dev/astro-sphere)
 - [astro-vitesse](https://github.com/adrian-ub/astro-vitesse)
-- [Miniblog](https://github.com/nicholasdly/miniblog)
+- [Miniblog v1](https://github.com/nicholasdly/miniblog/tree/v1)
 - [AstroPaper with I18n](https://github.com/yousef8/astro-paper-i18n)
 
 ## 📜 许可证

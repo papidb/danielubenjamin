@@ -3,8 +3,3 @@ allowBuilds:
   sharp: true
   swup: true
   workerd: true
-onlyBuiltDependencies:
-  - esbuild
-  - sharp
-  - swup
-  - workerd

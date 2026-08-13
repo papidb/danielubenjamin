@@ -4,10 +4,20 @@
 	prefixes: lucide, simple-icons, fa6-brands, svg-spinners;
 }
 
-:root {
+/*
+  Z-index scale:
+  < 0: Below
+  0-9: Base
+  10-99: Elevated
+  100-999: Component
+  1000-9999: Overlay
+  10000-99999: Frame
+*/
+
+:root,
+[data-theme="light"] {
 	--primary-color: #2a2a28;
-	--secondary-color: #50504d;
-	--remark-color: #757575;
+	--secondary-color: #7e7e7b;
 	--weak-color: #9f9f9c;
 	--background-color: #fffffd;
 	--block-color: #eeeeee;
@@ -15,19 +25,21 @@
 	--selection-color: #adadacc3;
 
 	--swup-fade-theme-duration: 0.15s;
+
+	.astro-code,
+	.astro-code span {
+		background-color: var(--block-color) !important;
+	}
 }
 
-@media (prefers-color-scheme: dark) {
-	:root {
-		--primary-color: #dddddb;
-		--secondary-color: #aaaaa8;
-		--remark-color: #a5a5a5;
-		--weak-color: #5d5d5a;
-		--background-color: #0e0e0c;
-		--block-color: #1e1e1e;
-		--shadow-color: #323231;
-		--selection-color: #adadacc3;
-	}
+[data-theme="dark"] {
+	--primary-color: #dddddb;
+	--secondary-color: #9e9e9b;
+	--weak-color: #5d5d5a;
+	--background-color: #0e0e0c;
+	--block-color: #1e1e1e;
+	--shadow-color: #323231;
+	--selection-color: #adadacc3;
 
 	.astro-code,
 	.astro-code span {
@@ -36,59 +48,29 @@
 	}
 }
 
-[data-theme="dark"] {
-	--primary-color: #dddddb;
-	--secondary-color: #aaaaa8;
-	--remark-color: #a5a5a5;
-	--weak-color: #5d5d5a;
-	--background-color: #0e0e0c;
-	--block-color: #1e1e1e;
-	--shadow-color: #323231;
-	--selection-color: #adadacc3;
-}
-
-/* Language-specific fonts */
-:lang(zh-cn) {
-	--font-serif: var(--font-noto-serif-sc);
-}
-
-:lang(ja) {
-	--font-serif: var(--font-noto-serif-jp);
-}
-
-[data-theme="dark"] .astro-code,
-[data-theme="dark"] .astro-code span {
-	color: var(--shiki-dark) !important;
-	background-color: var(--shiki-dark-bg) !important;
-}
-
 @layer base {
-	* {
-		margin: 0;
-		padding: 0;
-		box-sizing: border-box;
-		font-family: inherit;
-		user-select: none;
-		-webkit-tap-highlight-color: transparent;
-	}
-
-	*::selection {
+	::selection {
 		background-color: var(--selection-color);
 	}
 
-	*::-webkit-scrollbar {
+	::-webkit-scrollbar {
 		background-color: transparent;
 		width: 5px;
 		height: 5px;
 	}
 
-	*::-webkit-scrollbar-thumb {
+	::-webkit-scrollbar-thumb {
 		border-radius: 5px;
 		background-color: var(--primary-color);
 	}
 
+	*:focus-visible {
+		outline: 0.125rem solid var(--shadow-color);
+		outline-offset: 0.25rem;
+	}
+
 	@supports not selector(::-webkit-scrollbar) {
-		* {
+		:root {
 			scrollbar-width: thin;
 			scrollbar-color: var(--primary-color) transparent;
 		}
@@ -97,6 +79,7 @@
 	html {
 		scroll-behavior: smooth;
 		overflow-x: clip;
+		-webkit-tap-highlight-color: transparent;
 	}
 
 	body {
@@ -105,6 +88,7 @@
 		color: var(--primary-color);
 		background-color: var(--background-color);
 		overflow-x: clip;
+		user-select: none;
 	}
 
 	@media screen and (max-width: 640px) {
@@ -169,6 +153,10 @@
 	input,
 	textarea {
 		color: var(--primary-color);
+
+		&:focus {
+			outline: none;
+		}
 	}
 
 	textarea {
@@ -245,11 +233,11 @@ input[type="checkbox"].switch {
 }
 
 .medium-zoom-overlay {
-	z-index: 5;
+	z-index: 1000;
 }
 
 .medium-zoom-image--opened {
-	z-index: 5;
+	z-index: 1000;
 }
 
 ::view-transition-old(root),
@@ -259,25 +247,24 @@ input[type="checkbox"].switch {
 }
 
 ::view-transition-old(root) {
-	z-index: 1;
+	z-index: 10000;
 }
 
 ::view-transition-new(root) {
-	z-index: 10;
+	z-index: 10001;
 }
 
 [data-theme="dark"]::view-transition-old(root) {
-	z-index: 10;
+	z-index: 10001;
 }
 
 [data-theme="dark"]::view-transition-new(root) {
-	z-index: 1;
+	z-index: 10000;
 }
 
 @theme {
 	--color-primary: var(--primary-color);
 	--color-secondary: var(--secondary-color);
-	--color-remark: var(--remark-color);
 	--color-weak: var(--weak-color);
 	--color-background: var(--background-color);
 	--color-block: var(--block-color);
@@ -339,7 +326,7 @@ input[type="checkbox"].switch {
 	}
 
 	.input {
-		@apply border-b-2 border-b-primary py-0.5 bg-transparent outline-none;
+		@apply border-b-2 border-b-primary py-0.5 bg-transparent;
 	}
 
 	.form-button {
@@ -347,7 +334,7 @@ input[type="checkbox"].switch {
 	}
 
 	.pop {
-		@apply opacity-0 invisible z-1 transition-[opacity,visibility] group-hover/pop:opacity-100 group-hover/pop:visible;
+		@apply opacity-0 invisible z-2000 transition-[opacity,visibility] group-hover/pop:opacity-100 group-hover/pop:visible;
 	}
 }
 

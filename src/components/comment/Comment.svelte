@@ -1,8 +1,8 @@
 <script lang="ts">
 import { actions } from "astro:actions";
 import config from "$config";
-import remark from "$utils/remark";
-import Time from "$utils/time";
+import remark from "$lib/remark";
+import Time from "$lib/time";
 import Icon from "$components/Icon.svelte";
 import Modal from "$components/Modal.svelte";
 import { pushTip } from "$components/Tip.svelte";
@@ -11,7 +11,16 @@ import Self from "./Comment.svelte";
 import Reply from "./Reply.svelte";
 import context from "./context.svelte";
 
-let { comment, depth = 0 }: { comment: any; depth?: number } = $props();
+export type CommentItem = NonNullable<Awaited<ReturnType<typeof actions.comment.list>>["data"]>["treeification"][number];
+
+let {
+	section,
+	item,
+	link,
+	refresh,
+	comment,
+	depth = 0
+}: { section: string; item: string; link: string; refresh: (auto?: boolean) => Promise<void>; comment: CommentItem; depth?: number } = $props();
 const t = i18nit(context.locale);
 
 /** Minimum nesting depth for comment threads to ensure proper display */
@@ -43,7 +52,7 @@ async function remove() {
 	const { error } = await actions.comment.delete(comment.id);
 	if (!error) {
 		// Refresh comment list and close modal on successful deletion
-		context.refresh();
+		refresh();
 		deleteView = false;
 
 		pushTip("success", t("comment.remove.success"));
@@ -57,7 +66,7 @@ async function remove() {
 	<div id="delete" class="flex flex-col items-center justify-center gap-5">
 		<h2>{t("comment.remove.name")}</h2>
 		<input type="hidden" name="ID" value={comment.id} />
-		<time>{t("comment.time")}：{Time.full(comment.timestamp, Time.userTimezone)}</time>
+		<time>{t("comment.time")}: {Time.toString(comment.timestamp, true)}</time>
 		<section class="flex gap-5">
 			<button class="form-button" onclick={() => (deleteView = false)}>{t("cancel")}</button>
 			<button class="form-button" onclick={remove}>{t("confirm")}</button>
@@ -74,7 +83,7 @@ async function remove() {
 			{:then response}
 				{#if !response.error}
 					{#each response.data.reverse() as item}
-						<dt class="font-bold">{Time(item.timestamp)}</dt>
+						<dt class="font-bold">{Time.toString(item.timestamp)}</dt>
 						{#await remark.process(item.content) then html}
 							<dd class="markdown comment">{@html html}</dd>
 						{/await}
@@ -99,7 +108,7 @@ async function remove() {
 						{#if comment.author}<Icon name="lucide--signature" title={t("comment.author")} />{/if}
 						{#if comment.homepage}<a href={comment.homepage} target="_blank" class="inline-flex"><Icon name="lucide--house" /></a>{/if}
 						<span>·</span>
-						<time class="text-xs">{Time(comment.updated ?? comment.timestamp, Time.userTimezone).replace("-", " ")}</time>
+						<time class="text-xs">{Time.toString(comment.updated ?? comment.timestamp, true).replace("-", " ")}</time>
 					</p>
 					{#if comment.description}<span title={comment.description} class="text-secondary text-xs leading-normal truncate">{comment.description}</span>{/if}
 				</dt>
@@ -113,7 +122,7 @@ async function remove() {
 							<b class="text-weak">{t("drifter.deactivate.done")}</b>
 						{/if}
 						<span>·</span>
-						<time class="text-xs">{Time(comment.timestamp, Time.userTimezone).replace("-", " ")}</time>
+						<time class="text-xs">{Time.toString(comment.timestamp, true).replace("-", " ")}</time>
 					</p>
 				</dt>
 			{/if}
@@ -138,13 +147,13 @@ async function remove() {
 	</dl>
 	<div class:ms-7={depth < MIN_DEPTH} class:sm:ms-7={depth < Math.max(MIN_DEPTH, MAX_DEPTH)}>
 		{#if replyView && !editView}
-			<Reply reply={comment.id} bind:view={replyView} />
+			<Reply {section} {item} {link} {refresh} reply={comment.id} bind:view={replyView} />
 		{:else if editView && !replyView}
-			<Reply reply={comment.reply} edit={comment.id} text={comment.content} bind:view={editView} />
+			<Reply {section} {item} {link} {refresh} reply={comment.reply} edit={comment.id} text={comment.content} bind:view={editView} />
 		{/if}
 
 		{#each comment.subcomments as subcomment}
-			<Self comment={subcomment} depth={depth + 1} />
+			<Self {section} {item} {link} {refresh} comment={subcomment} depth={depth + 1} />
 		{/each}
 	</div>
 </main>

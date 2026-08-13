@@ -1,8 +1,9 @@
 <script lang="ts">
 import { ActionError, actions } from "astro:actions";
-import { slide } from "svelte/transition";
 import { onMount, untrack } from "svelte";
-import remark from "$utils/remark";
+import { slide } from "svelte/transition";
+import { Turnstile } from "svelte-turnstile";
+import remark from "$lib/remark";
 import Icon from "$components/Icon.svelte";
 import Modal from "$components/Modal.svelte";
 import { pushTip } from "$components/Tip.svelte";
@@ -11,7 +12,25 @@ import i18nit from "$i18n";
 import Drifter from "./Drifter.svelte";
 import context, { countdownComment } from "./context.svelte";
 
-let { reply, edit, text, view = $bindable() }: { reply?: string; edit?: string; text?: string; view?: boolean } = $props();
+let {
+	section,
+	item,
+	link,
+	refresh,
+	reply,
+	edit,
+	text,
+	view = $bindable()
+}: {
+	section: string;
+	item: string;
+	link: string;
+	refresh: (auto?: boolean) => Promise<void>;
+	reply?: string | null;
+	edit?: string;
+	text?: string | null;
+	view?: boolean;
+} = $props();
 
 const t = i18nit(context.locale);
 
@@ -26,15 +45,14 @@ let content: string = $state(""); // Comment content, will be initialized in onM
 let preview: boolean = $state(false); // Toggle between edit and preview mode
 let nickname: string | null = $state(null); // Nickname for unauthenticated users
 let captcha: string | undefined = $state(); // Captcha token for unauthenticated users
-let turnstileElement: HTMLElement | undefined = $state(); // Element to render Turnstile widget
-let turnstileID: string | undefined = $state(); // ID of the rendered Turnstile widget
+let resetTurnstile: (() => void) | undefined = $state(); // Function to reset Turnstile widget
 let overlength: boolean = $derived(content.length > Number(config.comment?.["max-length"])); // Content length check
 
 // Generate storage key
 const DRAFT_PREFIX = "comment-draft:";
 const DRAFT_SAVE_DELAY = 500;
 
-let draftKey = `${DRAFT_PREFIX}${context.section}:${context.item}`;
+let draftKey = `${DRAFT_PREFIX}${section}:${item}`;
 if (reply) draftKey += `:reply-${reply}`;
 if (edit) draftKey += `:edit-${edit}`;
 
@@ -118,18 +136,18 @@ async function submit() {
 
 		({ error } = await actions.comment.create({
 			locale: context.locale,
-			section: context.section,
-			item: context.item,
+			section: section,
+			item: item,
 			reply,
 			content,
-			link: context.link,
+			link: link,
 			push: context.subscription,
 			passer: { nickname, captcha }
 		}));
 
 		// Only reset turnstile for top-level comments (when reply is undefined) or if there was an error
 		if (!reply || error) {
-			window.turnstile.reset(turnstileID);
+			resetTurnstile?.();
 			captcha = undefined;
 		}
 
@@ -141,18 +159,18 @@ async function submit() {
 		// For authenticated users creating a comment
 		({ error } = await actions.comment.create({
 			locale: context.locale,
-			section: context.section,
-			item: context.item,
+			section: section,
+			item: item,
 			reply,
 			content,
-			link: context.link,
+			link: link,
 			push: context.subscription
 		}));
 	}
 
 	if (!error) {
 		// Refresh comment list to show updated comment
-		context.refresh();
+		refresh();
 
 		// Implement rate limiting: 5-second cooldown
 		countdownComment();
@@ -254,31 +272,6 @@ onMount(() => {
 	// If unauthenticated, setup nickname and Turnstile
 	if (!context.drifter) {
 		nickname = localStorage.getItem("nickname");
-
-		/**
-		 * Render Turnstile widget
-		 */
-		function initTurnstile() {
-			turnstileID = window.turnstile.render(turnstileElement, {
-				sitekey: context.turnstile,
-				callback: (token: string) => {
-					captcha = token;
-				},
-				"expired-callback": () => {
-					captcha = undefined;
-				},
-				"error-callback": () => {
-					captcha = undefined;
-				}
-			});
-		}
-
-		// Check if turnstile is available and render immediately
-		if (window.turnstile) {
-			initTurnstile();
-		} else {
-			window.onloadTurnstileCallback = initTurnstile;
-		}
 	}
 });
 </script>
@@ -322,15 +315,15 @@ onMount(() => {
 		</div>
 	{/if}
 	<div class:pointer-events-none={!enabled} class:blur={!enabled}>
-		<fieldset disabled={!enabled} class="group relative flex flex-col py-3 px-4 *:text-remark focus-within:*:text-primary focus-within:*:border-remark *:transition-[color,backgroud,border,width,height] *:duration-200 *:ease-out">
+		<fieldset disabled={!enabled} class="group relative flex flex-col py-3 px-4 *:text-secondary focus-within:*:text-primary focus-within:*:border-secondary *:transition-[color,backgroud,border,width,height] *:duration-200 *:ease-out">
 			{#snippet corner(top: boolean, start: boolean)}
 				<span aria-hidden="true" class="absolute -z-1 w-2 h-2 border-shadow group-focus-within:w-1/2 group-focus-within:h-1/2" class:top-0={top} class:bottom-0={!top} class:start-0={start} class:end-0={!start} class:border-t-2={top} class:border-b-2={!top} class:border-s-2={start} class:border-e-2={!start}></span>
 			{/snippet}
 
 			{@render corner(true, true)}{@render corner(true, false)}{@render corner(false, true)}{@render corner(false, false)}
 
-			<article class="flex flex-col min-h-20 overflow-auto">
-				<textarea hidden={preview} placeholder="   {t('comment.placeholder')}" bind:this={textarea} bind:value={content} class="grow w-full bg-transparent text-base outline-none resize-none transition-[height]"></textarea>
+			<article class="flex flex-col min-h-20 mb-2 overflow-auto">
+				<textarea hidden={preview} placeholder="   {t('comment.placeholder')}" bind:this={textarea} bind:value={content} class="grow w-full bg-transparent text-base resize-none transition-[height]"></textarea>
 				{#if preview}
 					{#if content.trim()}
 						{#await remark.process(content)}
@@ -359,7 +352,9 @@ onMount(() => {
 				{#if context.drifter}
 					<button onclick={() => (profileView = true)}><Icon name="lucide--user-round-pen" title={t("drifter.profile")} /></button>
 				{:else}
-					<div bind:this={turnstileElement}></div>
+					{#if context.turnstile}
+						<Turnstile siteKey={context.turnstile} bind:reset={resetTurnstile} on:expired={() => (captcha = undefined)} on:error={() => (captcha = undefined)} on:callback={({ detail }) => (captcha = detail.token)} />
+					{/if}
 					<input type="text" placeholder={t("comment.nickname.name")} bind:value={nickname} class="input border-weak w-35 text-sm" />
 					{#if context.oauth.length}
 						<button onclick={() => (reachView = true)}><Icon name="lucide--user-round" title={t("drifter.signin")} /></button>

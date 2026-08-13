@@ -111,8 +111,8 @@ export const GET: APIRoute = async ({ site, params }) => {
 		});
 	});
 
-	// Append stylesheet declaration to the feed
-	const xml = feed.atom1().replace(/(<\?xml version="1\.0" encoding="utf-8".*\?>)/, '$1\n<?xml-stylesheet type="text/xsl" href="/feed.xsl"?>');
+	// Generate Atom 1.0 XML feed
+	const xml = feed.atom1();
 
 	return new Response(xml, { headers: { "Content-Type": "application/xml" } });
 };

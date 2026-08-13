@@ -22,7 +22,7 @@
 > - `main` ブランチ：静的ビルド、任意の静的ホスティングプラットフォームにデプロイ可能。
 > - `cloudflare` ブランチ✅：内蔵コメントシステムを有効にし、Cloudflare のみでデプロイ可能。
 
-🎬 **ライブデモ**：[Cloudflare Workers](https://thought-lite.ttio.workers.dev/ja/)
+🎬 **ライブデモ**：[Cloudflare Workers](https://thought-lite.ttio.workers.dev/ja)
 
 ## ✨ 機能
 
@@ -75,14 +75,14 @@ pnpm dev
 
 ## 🔧 設定
 
-1. Cloudflare D1 を作成、[Cloudflare D1 設定ガイド](src/content/note/ja/cloudflare-d1.md)を参照。
-2. Cloudflare Turnstile を設定、[Cloudflare Turnstile 設定ガイド](src/content/note/ja/cloudflare-turnstile.md)を参照。
-    - 匿名コメントを有効にしない場合は、このステップをスキップできます。
-3. OAuth 認証を設定、[OAuth 設定ガイド](src/content/note/ja/oauth.md)を参照。
-4. サイト設定および国際化（i18n）設定をカスタマイズするには、以下のファイルを変更してください。[サイト設定ガイド](src/content/note/ja/configuration.md)と[国際化設定ガイド](src/content/note/ja/internationalization.md)を参照：
-    - `.env`
-    - `astro.config.ts`
-    - `site.config.ts`
+テーマ関連の構成については、次のドキュメントを参照してください：
+
+- [Astro 設定リファレンス](https://docs.astro.build/ja/reference/configuration-reference/)
+- [サイト設定ガイド](https://thought-lite.ttio.workers.dev/ja/note/configuration)
+- [国際化設定ガイド](https://thought-lite.ttio.workers.dev/ja/note/internationalization)
+- [コメントシステム設定ガイド](https://thought-lite.ttio.workers.dev/ja/note/comment)
+- [通知設定ガイド](https://thought-lite.ttio.workers.dev/ja/note/notification)
+- [OAuth 設定ガイド](https://thought-lite.ttio.workers.dev/ja/note/oauth)を参照。
 
 ## 💻 コマンド
 
@@ -135,7 +135,7 @@ pnpm db:migrate:local
 - `preface` - 序文、第一印象としてサイトのホームページに表示
 - `information` - 情報、各種説明的なコンテンツを含む
 
-詳細は[コンテンツ作成ガイド](src/content/note/ja/content.md)を参照してください。
+詳細は[コンテンツ作成ガイド](https://thought-lite.vercel.app/ja/note/content)を参照してください。
 
 ## 🤝 貢献
 
@@ -144,7 +144,8 @@ pnpm db:migrate:local
 - プロジェクトの宣伝や他のユーザーの支援
 - [Issues](https://github.com/tuyuritio/astro-theme-thought-lite/issues) の報告や新機能の提案
 - ドキュメントの改善や国際化（i18n）の支援
-- コード貢献の提出 - 詳細は[コード貢献ガイド](CONTRIBUTING.md)を参照してください
+- コード貢献の提出
+- 詳細は[コード貢献ガイド](CONTRIBUTING.md)を参照してください
 
 ## 🙏 謝辞
 
@@ -158,7 +159,6 @@ pnpm db:migrate:local
 - **フォント** - [Google Fonts](https://fonts.google.com/) | [ZeoSeven Fonts](https://fonts.zeoseven.com/)
 - **画像ビューア** - [Medium Zoom](https://github.com/francoischalifour/medium-zoom)
 - **SPA トランジション** - [Swup](https://swup.js.org/)
-- **時間処理** - [Luxon](https://moment.github.io/luxon/)
 - **OAuth 認証** - [Arctic](https://arcticjs.dev/)
 - **コード品質** - [Biome](https://biomejs.dev/)
 - **ORM** - [Drizzle ORM](https://orm.drizzle.team/)
@@ -169,7 +169,7 @@ pnpm db:migrate:local
 
 - [Astro Sphere](https://github.com/markhorn-dev/astro-sphere)
 - [astro-vitesse](https://github.com/adrian-ub/astro-vitesse)
-- [Miniblog](https://github.com/nicholasdly/miniblog)
+- [Miniblog v1](https://github.com/nicholasdly/miniblog/tree/v1)
 - [AstroPaper with I18n](https://github.com/yousef8/astro-paper-i18n)
 
 ## 📜 ライセンス

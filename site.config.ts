@@ -1,4 +1,4 @@
-import siteConfig, { providers } from "./src/utils/config";
+import siteConfig, { providers } from "./src/lib/config";
 
 const env = import.meta.env ?? {};
 
@@ -15,9 +15,18 @@ const config = siteConfig({
 		type: "CC BY-NC-ND 4.0",
 		year: "2025"
 	},
+	timezone: "UTC",
 	i18n: {
 		locales: ["en", "zh-cn", "ja"],
 		defaultLocale: "en"
+	},
+	pagination: {
+		note: 10,
+		jotting: 24
+	},
+	heatmap: {
+		unit: "day",
+		weeks: 20
 	},
 	feed: {
 		section: "*",
@@ -41,8 +50,7 @@ const email = Boolean(env.EMAIL_FROM);
 
 const oauth = providers([
 	{ name: "GitHub", logo: "simple-icons--github", clientID: env.GITHUB_CLIENT_ID, clientSecret: env.GITHUB_CLIENT_SECRET },
-	{ name: "Google", logo: "simple-icons--google", clientID: env.GOOGLE_CLIENT_ID, clientSecret: env.GOOGLE_CLIENT_SECRET },
-	{ name: "X", logo: "simple-icons--x", clientID: env.TWITTER_CLIENT_ID, clientSecret: env.TWITTER_CLIENT_SECRET }
+	{ name: "Google", logo: "simple-icons--google", clientID: env.GOOGLE_CLIENT_ID, clientSecret: env.GOOGLE_CLIENT_SECRET }
 ]);
 
 export { turnstile, oauth, monolocale, push, email };
