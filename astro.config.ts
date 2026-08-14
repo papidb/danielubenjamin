@@ -40,7 +40,7 @@ import ZeoSevenFonts from "./src/fonts/zeo-seven-fonts";
 export default defineConfig({
 	adapter: cloudflare({
 		prerenderEnvironment: "node",
-		imageService: "compile"
+		imageService: "passthrough"
 	}),
 	site: "https://thought-lite.ttio.workers.dev",
 	trailingSlash: "never",
